@@ -7,18 +7,27 @@ Click Run!
 #Ghost Template:
 #   a115_ghost_maze.py
 import turtle as trtl
+import turtle as trtl2
+import turtle as trtl3
 import random as rand
 
 trtl.speed(0)
 wn = trtl.Screen()
 wn.bgcolor("black")
 #-------------------maze and turtle config variables-----------------
-screen_h = 400
-screen_w = 420
+screen_h = 600
+screen_w = 600
 startx = 0
 starty = 0
 turtle_scale = 1.5
-
+#Timer and Scoreboard
+timer = 99
+counter_interval = 1000 
+timer_up = False
+score = 0
+score_writer = trtl2.Turtle()
+counter =  trtl3.Turtle()
+font_setup = ("Arial", 20, "normal")
 #---------------------------GHOST COMMANDS---------------------------
 #------ red ghost commands
 
@@ -99,6 +108,7 @@ pac_up = "3.Pacman_up.gif"
 pac_up_closed = "3.Pacman_up_closed.gif"
 pac_down = "3.Pacman_down.gif"
 pac_down_closed = "3.Pacman_down_closed.gif"
+
 trtl.addshape(pac_open)
 trtl.addshape(pac_closed)
 trtl.addshape(pac_up)
@@ -106,18 +116,36 @@ trtl.addshape(pac_up_closed)
 trtl.addshape(pac_down)
 trtl.addshape(pac_down_closed)
 PACMAN = trtl.Turtle(shape=pac_closed)
-PACMAN_UP = trtl.Turtle(shape=pac_up)
+
 PACMAN.color("white")
-
-
 #create dotmaker2000
 dot = "dot.gif"
 trtl.addshape(dot)
 DOT = trtl.Turtle(shape=dot)
 
+
+# countdown function
+def countdown():
+  global timer, timer_up
+  counter.clear()
+  if timer <= 0:
+    wn.bgpic("gameover.gif")
+    timer_up = True
+  else:
+    counter.write("Timer: " + str(timer), font=font_setup)
+    timer -= 1
+    counter.getscreen().ontimer(countdown, counter_interval) 
+
+# update and display the score
+def update_score():
+  global score
+  score = score + 1
+  score_writer.clear()
+  score_writer.write(score, font=font_setup)
+
 #===========================DRAW DOTS==========================
 pacman_pos = [] # array of tuples representing all of pacmans positions. Ghosts will follow this.
-collision_length = 10
+collision_length = 15
 
 dots = []
 DOT.speed(0)
@@ -186,14 +214,14 @@ def ghost_box():
     trtl.color("black")
     trtl.setheading(0)
     trtl.fillcolor("black")
-    trtl.begin_fill()
+    trtl.begin_fill()     
     for i in range(2):
       trtl.forward(75)
       trtl.left(90)
       trtl.forward(150)
       trtl.left(90)
-    trtl.penup()
-    trtl.end_fill()
+      trtl.penup()
+      trtl.end_fill()
 
     trtl.penup()
     trtl.setposition(75,30)
@@ -318,26 +346,34 @@ def pac_tp(x, y):
 def move_right():
     PACMAN.setheading(0)
     PACMAN.forward(25)
-
+    for dot in dots:
+      if abs(PACMAN.xcor() - dot.xcor()) <= collision_length and abs(PACMAN.ycor() - dot.ycor()) <= collision_length:
+        dot.hideturtle()
 
 def move_up():
     PACMAN.setheading(90)
     PACMAN.forward(25)
-
+    for dot in dots:
+      if abs(PACMAN.xcor() - dot.xcor()) <= collision_length and abs(PACMAN.ycor() - dot.ycor()) <= collision_length:
+        dot.hideturtle()
 
 def move_left():
     PACMAN.setheading(180)
     PACMAN.forward(25)
-
+    for dot in dots:
+       if abs(PACMAN.xcor() - dot.xcor()) <= collision_length and abs(PACMAN.ycor() - dot.ycor()) <= collision_length:
+        dot.hideturtle()
 
 def move_down():
     PACMAN.setheading(270)
     PACMAN.forward(25)
-
-
+    for dot in dots:
+      if abs(PACMAN.xcor() - dot.xcor()) <= collision_length and abs(PACMAN.ycor() - dot.ycor()) <= collision_length:
+        dot.hideturtle()
+  
 #------------------Pacman paths--------------------
 # Goes from left to right exits FINISHED
-'''
+
 def path_one(pos):
     PACMAN.setheading(0)    
     pac_tp(-200, 0)
@@ -419,7 +455,7 @@ def path_four(pos):
     pos = pac_jump(120, blinky, pos)
 
     return pos
-'''
+
 # ---------------------drawing map--------------------
 def long_rect():
     trtl.color("blue")
@@ -519,7 +555,9 @@ def init_boxes():
 
 
 #===========================DRAW BOXES==========================
+'''
 init_boxes()
+'''
 inky.showturtle()
 blinky.showturtle()
 clyde.showturtle()
@@ -548,6 +586,7 @@ while True:
     print("Path four")
     pos = path_four(pos)
 
+
   for dot in dots:
     if dot.isvisible():
       continue
@@ -556,8 +595,14 @@ while True:
 
   pos = 0
   pacman_pos.clear()
-
 '''
+
+
+
+
+PACMAN.penup()
+PACMAN.setposition(-200,0)
+
 wn.onkeypress(move_right, "d")
 wn.onkeypress(move_up, "w")
 wn.onkeypress(move_left, "a")
